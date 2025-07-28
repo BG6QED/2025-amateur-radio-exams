@@ -52,7 +52,7 @@
 
 - [CRAC官网](http://www.crac.org.cn)
 - [CRAC考试信息](http://82.157.138.16:8091/CRAC/crac/pages/list_examMsg.html)
-- [2025版题库](http://82.157.138.16:8091/CRAC/crac/pages/list_examMsg.html)
+- [2025版题库]([http://82.157.138.16:8091/CRAC/crac/pages/list_examMsg.html](http://82.157.138.16:8091/CRAC/crac/pages/list_examMsg.html))
 - [2025版题库PDF分流](https://pan.bg6qed.com/业余电台操作证书考试题库（2025年版）)
 
 ## 🤝 致谢
