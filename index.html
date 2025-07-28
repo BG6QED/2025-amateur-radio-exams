@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>业余电台考试模拟（2025 题库）</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <div class="container">
+    <h1>业余电台考试模拟</h1>
+    <h2 class="subtitle">2025 版题库</h2>
+
+    <div class="controls">
+      <select id="level">
+        <option value="A">A 类（40 题 · 40 分钟 · 30 分合格）</option>
+        <option value="B">B 类（60 题 · 60 分钟 · 45 分合格）</option>
+        <option value="C">C 类（90 题 · 90 分钟 · 70 分合格）</option>
+      </select>
+
+      <div class="buttons">
+        <button onclick="startQuiz()">随机抽题</button>
+        <button onclick="startSequential()">逐题答题</button>
+        <button onclick="toggleDark()">🌙</button>
+      </div>
+    </div>
+
+    <div id="timer" class="timer" style="display:none;">00:00</div>
+
+    <div id="quiz" style="display:none;"></div>
+
+    <button id="submitBtn" style="display:none;" onclick="submitQuiz()">提交</button>
+    <button id="nextBtn"   style="display:none;" onclick="nextQuestion()" disabled>下一题</button>
+
+    <div id="result" style="display:none;"></div>
+  </div>
+
+  <script src="script.js"></script>
+</body>
+</html>
