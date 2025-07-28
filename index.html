@@ -3,40 +3,91 @@
 <head>
   <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta name="description" content="业余电台操作证考试模拟系统 - 支持A/B/C类题库训练"/>
+  <meta name="keywords" content="业余电台,考试模拟,无线电,火腿"/>
   <title>业余电台操作证考试模拟</title>
   <link rel="stylesheet" href="styles.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.css"/>
 </head>
 <body>
+  <a href="#main-content" class="skip-link">跳到主要内容</a>
+  
   <div class="container">
-    <h1>业余电台操作证考试模拟</h1>
-    <h2 class="subtitle">2025 版题库</h2>
+    <header>
+      <h1>业余电台操作证考试模拟</h1>
+      <p class="subtitle" aria-label="2025版题库">2025 版题库</p>
+    </header>
 
-    <div class="controls">
-      <select id="level">
-        <option value="A">A 类（40 题 · 40 分钟 · 30 分合格）</option>
-        <option value="B">B 类（60 题 · 60 分钟 · 45 分合格）</option>
-        <option value="C">C 类（90 题 · 90 分钟 · 70 分合格）</option>
-      </select>
+    <main id="main-content">
+      <div class="controls" role="form" aria-labelledby="controls-heading">
+        <h2 id="controls-heading" class="visually-hidden">控制面板</h2>
+        <select id="level" aria-label="选择考试类别">
+          <option value="A">A 类（40 题 · 40 分钟 · 30 分合格）</option>
+          <option value="B">B 类（60 题 · 60 分钟 · 45 分合格）</option>
+          <option value="C">C 类（90 题 · 90 分钟 · 70 分合格）</option>
+        </select>
 
-      <div class="buttons">
-        <button onclick="startQuiz()">随机抽题</button>
-        <button onclick="startSequential()">逐题答题</button>
-        <button onclick="toggleDark()">🌙</button>
+        <div class="buttons">
+          <button onclick="startQuiz()" aria-label="开始随机抽题模式">
+            <i class="fas fa-random"></i> 随机抽题
+          </button>
+          <button onclick="startSequential()" aria-label="开始逐题答题模式">
+            <i class="fas fa-list-ol"></i> 逐题答题
+          </button>
+          <button onclick="toggleDark()" aria-label="切换深色模式" id="darkModeBtn">
+            <i class="fas fa-adjust"></i>
+          </button>
+        </div>
+      </div>
+
+      <div id="timer" class="timer" style="display:none;" aria-live="polite">
+        <i class="fas fa-clock"></i> <span id="timeDisplay">00:00</span>
+      </div>
+
+      <div id="quiz" style="display:none;" role="main" aria-live="polite"></div>
+
+      <div class="navigation-buttons">
+        <button id="prevBtn" style="display:none;" onclick="prevQuestion()" disabled aria-label="上一题">
+          <i class="fas fa-chevron-left"></i> 上一题
+        </button>
+        <button id="submitBtn" style="display:none;" onclick="submitQuiz()" aria-label="提交答案">
+          <i class="fas fa-check"></i> 提交
+        </button>
+        <button id="nextBtn" style="display:none;" onclick="nextQuestion()" disabled aria-label="下一题">
+          <i class="fas fa-chevron-right"></i> 下一题
+        </button>
+      </div>
+
+      <div id="result" style="display:none;" role="status" aria-live="assertive"></div>
+      
+      <section id="history-section" aria-labelledby="history-heading">
+        <h2 id="history-heading">历史成绩</h2>
+        <canvas id="historyChart" aria-label="历史成绩图表"></canvas>
+      </section>
+    </main>
+  </div>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="counter-container">
+        <img src="https://count.getloli.com/@exam?name=exam&theme=rule34&padding=1&offset=0&align=top&scale=1&pixelated=1&darkmode=auto" alt="EXAM" />
+      </div>
+      <div class="footer-links">
+        <a href="https://onenice.site/" target="_blank" rel="noopener" aria-label="火腿网址导航">
+          <i class="fas fa-link"></i> 火腿网址导航
+        </a>
+        <a href="https://bg6qed.com" target="_blank" rel="noopener" aria-label="BG6QED个人网站">
+          <i class="fas fa-broadcast-tower"></i> VY73 DE BG6QED
+        </a>
+        <a href="https://pan.bg6qed.com/业余电台操作证书考试题库（2025年版）" target="_blank" rel="noopener" aria-label="2025版题库PDF分流">
+          <i class="fas fa-book"></i> 2025版题库PDF分流
+        </a>
       </div>
     </div>
-
-    <div id="timer" class="timer" style="display:none;">00:00</div>
-
-    <div id="quiz" style="display:none;"></div>
-
-    <button id="submitBtn" style="display:none;" onclick="submitQuiz()">提交</button>
-    <button id="nextBtn"   style="display:none;" onclick="nextQuestion()" disabled>下一题</button>
-
-    <div id="result" style="display:none;"></div>
-  </div>
-  <footer class="footer" style="text-align: center;">
-        <img src="https://count.getloli.com/@exam?name=exam&theme=rule34&padding=1&offset=0&align=top&scale=1&pixelated=1&darkmode=auto" alt="exam" />
   </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
   <script src="script.js"></script>
 </body>
 </html>
