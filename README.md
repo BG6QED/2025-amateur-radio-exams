@@ -1,6 +1,6 @@
 # 业余电台操作证考试模拟系统
 
-基于2025版题库的业余电台操作证书考试模拟系统，支持 A/B/C 三类考试题库的在线练习。
+使用2025版题库的业余电台操作证书考试模拟系统，支持 A/B/C 三类考试题库的在线练习。
 
 ## 🌟 功能特性
 
@@ -39,13 +39,14 @@
 ├── questions_A.json    # A类题库  
 ├── questions_B.json    # B类题库  
 ├── questions_C.json    # C类题库  
+├── img                 # 题目插图    
 └── README.md  
 
 ## 🌐 相关链接
 
 - [CRAC官网](http://www.crac.org.cn)
 - [CRAC考试信息](http://82.157.138.16:8091/CRAC/crac/pages/list_examMsg.html)
-- [2025版题库](http://82.157.138.16:8091/CRAC/crac/pages/list_examMsg.html)
+- [2025版题库](http://www.crac.org.cn/News/Detail?ID=5f42557b067b4fac9cd74184b19a70e8)
 - [2025版题库PDF分流](https://pan.bg6qed.com/业余电台操作证书考试题库（2025年版）)
 
 ## 🤝 致谢
