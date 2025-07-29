@@ -43,9 +43,8 @@ const pick = (l) => {
   return [...s, ...m];
 };
 
-/* 打乱选项并同步 correct，同时记录原始正确答案 */
+/* 打乱选项并同步 correct，同时记录原始正确答案文本 */
 const syncOptions = (q) => {
-  // 保存原始正确答案对应的选项内容（文本）
   q.originalCorrectTexts = q.correct
     .split("")
     .map((c) => q.options[c.charCodeAt(0) - 65]);
@@ -54,7 +53,6 @@ const syncOptions = (q) => {
   shuffle(opts);
   q.options = opts.map((o) => o.t);
 
-  // 根据打乱的选项重新计算 correct 字母
   q.correct = opts
     .map((o, i) => (q.originalCorrectTexts.includes(o.t) ? i : null))
     .filter((v) => v !== null)
@@ -62,7 +60,7 @@ const syncOptions = (q) => {
     .join("");
 };
 
-/* 渲染一题 */
+/* 渲染一题（逐题模式） */
 const render = (q) => {
   syncOptions(q);
   const multi = /MC(?!1)/.test(q.type);
@@ -196,17 +194,17 @@ const startSequential = async () => {
   document.getElementById("nextBtn").disabled = true;
 };
 
-/* 逐题检查答案 */
+/* 逐题检查答案（单选/多选通用） */
 const checkAnswer = () => {
   const q = selected[current];
   const user = [...document.querySelectorAll('input[name="q"]:checked')]
     .map((e) => e.value)
     .sort();
 
-  // 将用户选择的字母映射到对应的选项内容
+  // 将用户选择的字母映射为对应选项文本
   const userTexts = user.map(v => q.options[v.charCodeAt(0) - 65]);
 
-  // 检查用户选择的选项内容是否与原始正确答案匹配
+  // 与原始正确答案文本比对
   const isCorrect =
     userTexts.length === q.originalCorrectTexts.length &&
     q.originalCorrectTexts.every(txt => userTexts.includes(txt));
