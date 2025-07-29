@@ -17,13 +17,18 @@ const shuffle = (a) => {
 };
 const load = async (l) => await (await fetch(`questions_${l}.json`)).json();
 
-/* ---------- 抽取工具：仅随机抽题用 ---------- */
+/* 以 correct 长度判断多选 */
+const isMultiChoice = (q) => q.correct.length > 1;
+
+/* ---------- 抽取：仅随机抽题用 ---------- */
 const pick = (l) => {
   const singleNeed = l === "A" ? 32 : l === "B" ? 45 : 70;
   const multiNeed  = l === "A" ? 8  : l === "B" ? 15 : 20;
 
   const single = [], multi = [];
-  questions.forEach(q => (/^MC1/.test(q.type) ? single : multi).push(q));
+  questions.forEach(q =>
+    (isMultiChoice(q) ? multi : single).push(q)
+  );
 
   const used = new Set();
   const unique = arr => arr.filter(q => !used.has(q.category) && used.add(q.category));
@@ -34,7 +39,7 @@ const pick = (l) => {
   return [...s, ...m];
 };
 
-/* ---------- 打乱选项并同步 correct ---------- */
+/* ---------- 打乱选项 ---------- */
 const syncOptions = (q) => {
   const correctIndices = q.correct.split("").map(c => c.charCodeAt(0) - 65);
   const opts = q.options.map((t, i) => ({ t, i }));
@@ -49,8 +54,7 @@ const syncOptions = (q) => {
 /* ---------- 渲染题目 ---------- */
 const render = (q) => {
   syncOptions(q);
-  const isMulti = !q.type.startsWith("MC1");
-  const type = isMulti ? "checkbox" : "radio";
+  const type = isMultiChoice(q) ? "checkbox" : "radio";
   let html = `<div class="question">${current + 1}. ${q.question}`;
   if (q.image)
     html += `<br><img src="${q.image}" alt="题目相关图片" style="max-width:100%;border-radius:8px">`;
@@ -65,7 +69,7 @@ const render = (q) => {
   document.getElementById("nextBtn").disabled = true;
 };
 
-/* ---------- 随机抽题模块 ---------- */
+/* ---------- 随机抽题 ---------- */
 const startQuiz = async () => {
   mode = "batch";
   const l = document.getElementById("level").value;
@@ -77,8 +81,7 @@ const startQuiz = async () => {
   document.getElementById("quiz").innerHTML = selected
     .map((q, i) => {
       syncOptions(q);
-      const isMulti = !q.type.startsWith("MC1");
-      const type = isMulti ? "checkbox" : "radio";
+      const type = isMultiChoice(q) ? "checkbox" : "radio";
       let html = `<div class="question">${i + 1}. ${q.question}`;
       if (q.image) html += `<br><img src="${q.image}" alt="题目相关图片" style="max-width:100%;border-radius:8px">`;
       html += `<div class="options">`;
@@ -96,16 +99,14 @@ const startQuiz = async () => {
   startTimer();
 };
 
-/* ---------- 逐题答题模块 ---------- */
+/* ---------- 逐题答题：不抽取，按顺序 ---------- */
 const startSequential = async () => {
   mode = "seq";
   const l = document.getElementById("level").value;
   questions = await load(l);
-  // 不抽取，按顺序全部题目
-  selected = questions;
+  selected = questions; // 全部题目顺序使用
   answers = Array(selected.length).fill(null);
   current = 0;
-
   render(selected[current]);
   ["quiz", "nextBtn", "prevBtn"].forEach(id => document.getElementById(id).style.display = "block");
   ["timer", "submitBtn", "result"].forEach(id => document.getElementById(id).style.display = "none");
@@ -145,7 +146,7 @@ const nextQuestion = () => {
   }
 };
 
-/* ---------- 倒计时 ---------- */
+/* ---------- 计时 ---------- */
 const startTimer = () => {
   endTime = Date.now() + timeLeft * 1000;
   const tick = () => {
