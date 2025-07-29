@@ -83,6 +83,13 @@ button:disabled {
   background: #a5adba;
   cursor: not-allowed;
 }
+.control-btn {
+  background: #626f86;
+  color: #fff;
+}
+.control-btn:enabled {
+  background: var(--success);
+}
 .quiz {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
@@ -164,12 +171,6 @@ input[type=checkbox]:checked::after {
 }
 .result {
   margin-top: 30px;
-}
-.history {
-  margin-top: 40px;
-  padding: 20px;
-  background: var(--panel);
-  border-radius: var(--radius);
 }
 footer {
   margin-top: auto;

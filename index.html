@@ -7,7 +7,6 @@
   <title>业余电台操作证考试模拟</title>
   <link rel="stylesheet" href="styles.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.min.js"></script>
 </head>
 <body>
   <div class="container">
@@ -20,9 +19,9 @@
         <option value="C">C 类（90 题 · 90 分钟 · 70 分合格）</option>
       </select>
       <div class="buttons">
-        <button onclick="startQuiz()" aria-label="开始随机抽题考试">随机抽题</button>
-        <button onclick="startSequential()" aria-label="开始逐题答题模式">逐题答题</button>
-        <button onclick="toggleDark()" aria-label="切换黑暗模式">
+        <button class="control-btn" onclick="startQuiz()" aria-label="开始随机抽题考试">随机抽题</button>
+        <button class="control-btn" onclick="startSequential()" aria-label="开始逐题答题模式">逐题答题</button>
+        <button class="control-btn" onclick="toggleDark()" aria-label="切换深色模式" id="darkModeBtn">
           <i class="fas fa-moon"></i>
         </button>
       </div>
@@ -33,10 +32,6 @@
     <button id="nextBtn" class="next-btn" onclick="nextQuestion()" style="display:none" aria-label="下一题">下一题</button>
     <button id="submitBtn" class="submit-btn" onclick="submitQuiz()" style="display:none" aria-label="提交考试">提交</button>
     <div id="result" class="result" style="display:none" role="region" aria-label="考试结果"></div>
-    <div id="history" class="history" role="region" aria-label="历史成绩">
-      <h2>历史成绩</h2>
-      <canvas id="scoreChart" style="max-height:300px"></canvas>
-    </div>
   </div>
   <footer role="contentinfo">
     <p>

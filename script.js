@@ -17,62 +17,6 @@ const shuffle = (a) => {
 };
 const load = async (l) => await (await fetch(`questions_${l}.json`)).json();
 
-/* Cookie 工具 */
-const setCookie = (name, value, days) => {
-  const expires = new Date(Date.now() + days * 864e5).toUTCString();
-  document.cookie = `${name}=${encodeURIComponent(JSON.stringify(value))};expires=${expires};path=/`;
-};
-const getCookie = (name) => {
-  const match = document.cookie.match(new RegExp(`(^| )${name}=([^;]+)`));
-  return match ? JSON.parse(decodeURIComponent(match[2])) : null;
-};
-
-/* 加载历史记录 */
-const loadHistory = () => {
-  return getCookie("quizHistory") || [];
-};
-
-/* 保存历史记录 */
-const saveHistory = (level, score, total, timeUsed) => {
-  const history = loadHistory();
-  history.push({
-    level,
-    date: new Date().toISOString(),
-    score,
-    total,
-    timeUsed
-  });
-  setCookie("quizHistory", history, 30);
-};
-
-/* 绘制折线图 */
-const renderChart = () => {
-  const history = loadHistory();
-  const ctx = document.getElementById("scoreChart").getContext("2d");
-  const datasets = ["A", "B", "C"].map(level => ({
-    label: `级别 ${level}`,
-    data: history
-      .filter(h => h.level === level)
-      .map(h => ({
-        x: new Date(h.date).toLocaleString(),
-        y: h.score / h.total * 100
-      })),
-    borderColor: level === "A" ? "#0052cc" : level === "B" ? "#00875a" : "#de350b",
-    fill: false
-  }));
-  new Chart(ctx, {
-    type: "line",
-    data: { datasets },
-    options: {
-      responsive: true,
-      scales: {
-        x: { title: { display: true, text: "考试时间" } },
-        y: { title: { display: true, text: "得分率 (%)" }, min: 0, max: 100 }
-      }
-    }
-  });
-};
-
 /* 抽取：单选在前，多选在后，category 去重 */
 const pick = (l) => {
   const singleNeed = l === "A" ? 32 : l === "B" ? 45 : 70;
@@ -157,7 +101,6 @@ const submitQuiz = () => {
   const pass = { A: 30, B: 45, C: 70 }[l];
   let score = 0,
     wrong = [];
-  const timeUsed = timeLeft - Math.max(0, Math.floor((endTime - Date.now()) / 1000));
   answers = mode === "batch"
     ? Array.from({ length: selected.length }, (_, i) =>
         [...document.querySelectorAll(`input[name=q${i}]:checked`)].map((e) =>
@@ -175,7 +118,6 @@ const submitQuiz = () => {
       wrong.push({ ...q, user, userText, correctText });
     }
   });
-  saveHistory(l, score, selected.length, timeUsed);
   const res = document.getElementById("result");
   res.innerHTML =
     `<h2>得分：${score}/${selected.length}</h2>` +
@@ -191,7 +133,6 @@ const submitQuiz = () => {
     (id) => (document.getElementById(id).style.display = "none")
   );
   res.style.display = "block";
-  renderChart();
 };
 
 /* 随机抽题 */
@@ -236,8 +177,8 @@ const startSequential = async () => {
   const single = questions.filter((q) => /MC1/.test(q.type.split("-")[0]));
   const multi = questions.filter((q) => /MC(?!1)/.test(q.type.split("-")[0]));
   selected = [...single, ...multi];
-  answers = getCookie(`seqAnswers_${l}`) || Array(selected.length).fill(null);
-  current = getCookie(`seqProgress_${l}`) || 0;
+  answers = Array(selected.length).fill(null);
+  current = 0;
   render(selected[current]);
   ["quiz", "nextBtn", "prevBtn"].forEach(
     (id) => (document.getElementById(id).style.display = "block")
@@ -256,7 +197,6 @@ const checkAnswer = () => {
     (e) => e.value
   ).sort();
   answers[current] = user;
-  setCookie(`seqAnswers_${document.getElementById("level").value}`, answers, 30);
   const right = q.correct.split("").sort();
   document.getElementById("nextBtn").disabled = user.join("") !== right.join("");
 };
@@ -265,7 +205,6 @@ const checkAnswer = () => {
 const prevQuestion = () => {
   if (current > 0) {
     current--;
-    setCookie(`seqProgress_${document.getElementById("level").value}`, current, 30);
     render(selected[current]);
     document.getElementById("prevBtn").style.display = current > 0 ? "block" : "none";
     document.getElementById("nextBtn").disabled = !answers[current];
@@ -275,7 +214,6 @@ const prevQuestion = () => {
 /* 下一题 */
 const nextQuestion = () => {
   current++;
-  setCookie(`seqProgress_${document.getElementById("level").value}`, current, 30);
   if (current < selected.length) {
     render(selected[current]);
     document.getElementById("prevBtn").style.display = "block";
@@ -288,17 +226,10 @@ const nextQuestion = () => {
 /* 黑暗模式切换 */
 const toggleDark = () => {
   document.body.classList.toggle("dark-mode");
-  setCookie("darkMode", document.body.classList.contains("dark-mode"), 30);
+  const darkModeBtn = document.getElementById("darkModeBtn");
+  if (document.body.classList.contains("dark-mode")) {
+    darkModeBtn.innerHTML = '<i class="fas fa-sun"></i>';
+  } else {
+    darkModeBtn.innerHTML = '<i class="fas fa-moon"></i>';
+  }
 };
-
-/* 初始化 */
-document.addEventListener("DOMContentLoaded", () => {
-  const darkMode = getCookie("darkMode");
-  if (darkMode) document.body.classList.add("dark-mode");
-  const level = getCookie("lastLevel");
-  if (level) document.getElementById("level").value = level;
-  document.getElementById("level").onchange = () => {
-    setCookie("lastLevel", document.getElementById("level").value, 30);
-  };
-  renderChart();
-});
