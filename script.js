@@ -20,23 +20,28 @@ const load = async (l) => await (await fetch(`questions_${l}.json`)).json();
 /* 以 correct 长度判断多选 */
 const isMultiChoice = (q) => q.correct.length > 1;
 
-/* ---------- 抽取：仅随机抽题用 ---------- */
+/* ---------- 抽取：随机抽题 ---------- */
 const pick = (l) => {
   const singleNeed = l === "A" ? 32 : l === "B" ? 45 : 70;
-  const multiNeed  = l === "A" ? 8  : l === "B" ? 15 : 20;
+  const multiNeed = l === "A" ? 8 : l === "B" ? 15 : 20;
 
   const single = [], multi = [];
-  questions.forEach(q =>
+  questions.forEach(q => 
     (isMultiChoice(q) ? multi : single).push(q)
   );
 
   const used = new Set();
-  const unique = arr => arr.filter(q => !used.has(q.category) && used.add(q.category));
+  const unique = arr => arr.filter(q => {
+    const key = `${q.id}-${q.category}-${q.type}`;
+    if (used.has(key)) return false;
+    used.add(key);
+    return true;
+  });
 
   const s = shuffle(unique(shuffle(single))).slice(0, singleNeed);
   used.clear();
   const m = shuffle(unique(shuffle(multi))).slice(0, multiNeed);
-  return [...s, ...m];
+  return shuffle([...s, ...m]);
 };
 
 /* ---------- 打乱选项 ---------- */
@@ -104,7 +109,7 @@ const startSequential = async () => {
   mode = "seq";
   const l = document.getElementById("level").value;
   questions = await load(l);
-  selected = questions; // 全部题目顺序使用
+  selected = questions;
   answers = Array(selected.length).fill(null);
   current = 0;
   render(selected[current]);
@@ -179,7 +184,7 @@ const submitQuiz = () => {
     const correct = q.correct.split("").sort();
     if (user.join("") === correct.join("")) score++;
     else {
-      const userText = user.map(v => q.options[v.charCodeAt(0) - 65]).join(", ");
+      const userText = user.length ? user.map(v => q.options[v.charCodeAt(0) - 65]).join(", ") : "未选择";
       const correctText = q.correct.split("").map(v => q.options[v.charCodeAt(0) - 65]).join(", ");
       wrong.push({ ...q, user, userText, correctText });
     }
@@ -191,7 +196,7 @@ const submitQuiz = () => {
   if (wrong.length) {
     res.innerHTML += "<h3>错题回顾：</h3>";
     wrong.forEach(w =>
-      res.innerHTML += `<div><p><strong>题目：</strong>${w.question}</p><p><strong>你的答案：</strong><span style="color:var(--danger)">${w.user.join("") || "未选择"} (${w.userText || "无"})</span></p><p><strong>正确答案：</strong><span style="color:var(--success)">${w.correct} (${w.correctText})</span></p></div>`
+      res.innerHTML += `<div><p><strong>题目：</strong>${w.question}</p><p><strong>你的答案：</strong><span style="color:var(--danger)">${w.user.join("") || "未选择"} (${w.userText})</span></p><p><strong>正确答案：</strong><span style="color:var(--success)">${w.correct} (${w.correctText})</span></p></div>`
     );
   }
   ["quiz", "timer", "submitBtn", "nextBtn", "prevBtn"].forEach(id => document.getElementById(id).style.display = "none");
